@@ -11,7 +11,8 @@ class PostController extends Controller
     public function index()
     {
         //dd(Post::get());
-        $posts = Post::get();
+        // $posts = Post::get();
+        $posts = Post::orderBy('title', 'DESC')->paginate(2);
         return view('admin.posts.index', [
             'posts' => $posts,
         ]);
@@ -94,5 +95,22 @@ class PostController extends Controller
 
 
         // dd("Editando o post: {$post->id}");
+    }
+
+    public function search(Request $request)
+    {
+        $filters = $request->except(['_token']);
+
+        $posts = Post::where('title', 'LIKE', "%{$request->search}%")
+            ->orWhere('content', 'LIKE', "%{$request->search}%")
+            ->paginate(2);
+
+        return view('admin.posts.index', [
+            'posts' => $posts,
+            'filters' => $filters,
+        ]);
+        //     ->toSql();
+        // dd($posts);
+        // dd("pesquisando por {$request->search}");
     }
 }
